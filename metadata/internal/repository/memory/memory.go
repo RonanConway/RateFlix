@@ -1,4 +1,4 @@
-package in_memory
+package memory
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type Repository struct {
 
 // New creates a new in memory repo
 func New() *Repository {
-	return &Repository{data: map[string]*model.Metadata}
+	return &Repository{data: map[string]*model.Metadata{}}
 }
 
 // Retrieves movie metadata for movie by Id

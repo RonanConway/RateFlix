@@ -1,7 +1,6 @@
-package http
+package httphandler
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"log"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/RonanConway/RateFlix/metadata/internal/controller/metadata"
 	"github.com/RonanConway/RateFlix/metadata/internal/repository"
-	"github.com/gin-gonic/gin"
 )
 
 // Handler defines a movie metadata HTTP handler
@@ -22,29 +20,25 @@ func New(ctrl *metadata.Controller) *Handler {
 	return &Handler{ctrl}
 }
 
-func (h *Handler) GetMovieMetadata(context *gin.Context) {
-	Id, err := context.Param("id")
-
-	buf := new(bytes.Buffer)
-	encoder := json.NewEncoder(buf)
-
-	if err != nil {
-		context.JSON(http.StatusBadGateway, gin.H{"message", "No movie Id specifed in the request"})
+func (h *Handler) GetMovieMetadata(w http.ResponseWriter, req *http.Request) {
+	id := req.FormValue("id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
-
-	metadata, err := h.ctrl.GetMetadata(context, Id)
+	ctx := req.Context()
+	m, err := h.ctrl.GetMetadata(ctx, id)
 	if err != nil && errors.Is(err, repository.ErrNotFound) {
-		context.JSON(http.StatusNotFound, gin.H{"message": "no metadata found for Id"})
+		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
-		log.Printf("Repository get error: %v\n", err)
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Error fetching from repository"})
+		log.Printf("REpository get error: %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if err := encoder.Encode(metadata); err != nil {
-		log.Printf("Response encode error")
+	if err := json.NewEncoder(w).Encode(m); err != nil {
+		log.Printf("Response encode error: %v\n", err)
 	}
 
-	return context.JSON(http.StatusOK, gin.H{"message": "Movie metadata ok"})
 }
