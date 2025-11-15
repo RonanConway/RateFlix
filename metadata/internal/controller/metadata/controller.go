@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/RonanConway/RateFlix/metadata/internal/repository"
-	model "github.com/RonanConway/RateFlix/metadata/pkg"
+	"github.com/RonanConway/RateFlix/metadata/pkg/model"
 )
 
 var ErrNotFound = errors.New("not found")

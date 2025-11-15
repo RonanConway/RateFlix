@@ -5,14 +5,17 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"time"
 
+	"github.com/RonanConway/RateFlix/gen"
 	"github.com/RonanConway/RateFlix/metadata/internal/controller/metadata"
-	httphandler "github.com/RonanConway/RateFlix/metadata/internal/handler"
+	grpchandler "github.com/RonanConway/RateFlix/metadata/internal/handler/grpc"
 	"github.com/RonanConway/RateFlix/metadata/internal/repository/memory"
 	"github.com/RonanConway/RateFlix/pkg/discovery"
 	"github.com/RonanConway/RateFlix/pkg/discovery/consul"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 const serviceName = "metadata"
@@ -21,7 +24,7 @@ func main() {
 	var port int
 	flag.IntVar(&port, "port", 8081, "API handler port")
 	flag.Parse()
-	log.Printf("Starting the metadata service on port %d", port)
+	log.Printf("Starting the movie metadata service on port %d", port)
 	registry, err := consul.NewRegistry("localhost:8500")
 	if err != nil {
 		panic(err)
@@ -43,10 +46,16 @@ func main() {
 
 	defer registry.Deregister(ctx, instanceID, serviceName)
 	repo := memory.New()
-	svc := metadata.New(repo)
-	h := httphandler.New(svc)
-	http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+	ctrl := metadata.New(repo)
+	handler := grpchandler.New(ctrl)
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%v", port))
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+	srv := grpc.NewServer()
+	reflection.Register(srv)
+	gen.RegisterMetadataServiceServer(srv, handler)
+	if err := srv.Serve(lis); err != nil {
 		panic(err)
 	}
 }
