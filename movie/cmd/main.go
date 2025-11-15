@@ -52,5 +52,4 @@ func main() {
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 		panic(err)
 	}
-
 }

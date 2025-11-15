@@ -21,7 +21,7 @@ func New() *Repository {
 
 // Retrieves movie metadata for movie by Id
 // Good practice for all functions performing IO operations to accept a context.
-func (r *Repository) GetMetadata(_ context.Context, id string) (*model.Metadata, error) {
+func (r *Repository) Get(_ context.Context, id string) (*model.Metadata, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -34,7 +34,7 @@ func (r *Repository) GetMetadata(_ context.Context, id string) (*model.Metadata,
 }
 
 // Adds movie metadata for a given Id
-func (r *Repository) AddMetadata(_ context.Context, id string, metadata *model.Metadata) error {
+func (r *Repository) Put(_ context.Context, id string, metadata *model.Metadata) error {
 	r.Lock()
 	defer r.Unlock()
 	r.data[id] = metadata

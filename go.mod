@@ -2,7 +2,10 @@ module github.com/RonanConway/RateFlix
 
 go 1.25.3
 
-require github.com/hashicorp/consul/api v1.33.0
+require (
+	github.com/hashicorp/consul/api v1.33.0
+	google.golang.org/protobuf v1.26.0-rc.1
+)
 
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect

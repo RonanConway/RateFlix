@@ -11,7 +11,7 @@ import (
 var ErrNotFound = errors.New("not found")
 
 type metadataRepository interface {
-	GetMetadata(ctx context.Context, id string) (*model.Metadata, error)
+	Get(ctx context.Context, id string) (*model.Metadata, error)
 }
 
 // Controller defines a metadata service controller
@@ -24,8 +24,8 @@ func New(repo metadataRepository) *Controller {
 	return &Controller{repo}
 }
 
-func (controller *Controller) GetMetadata(ctx context.Context, id string) (*model.Metadata, error) {
-	result, err := controller.repo.GetMetadata(ctx, id)
+func (controller *Controller) Get(ctx context.Context, id string) (*model.Metadata, error) {
+	result, err := controller.repo.Get(ctx, id)
 	if err != nil && errors.Is(err, repository.ErrNotFound) {
 		return nil, ErrNotFound
 	}

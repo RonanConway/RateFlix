@@ -45,7 +45,7 @@ func main() {
 	repo := memory.New()
 	svc := metadata.New(repo)
 	h := httphandler.New(svc)
-	http.Handle("/metadata", http.HandlerFunc(h.GetMovieMetadata))
+	http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 		panic(err)
 	}

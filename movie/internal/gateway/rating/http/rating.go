@@ -31,7 +31,7 @@ func (g *Gateway) GetAggregatedRating(ctx context.Context, recordID model.Record
 		return 0, err
 	}
 	url := "http://" + addrs[rand.Intn(len(addrs))] + "/rating"
-	log.Printf("Calling rating service. Request: GET " + url)
+	log.Printf("Calling rating service. Request: GET %s", url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -68,7 +68,7 @@ func (g *Gateway) PutRating(ctx context.Context, recordID model.RecordID, record
 	}
 
 	url := "http://" + addrs[rand.Intn(len(addrs))] + "/rating"
-	log.Printf("Calling rating service. Request: PUT " + url)
+	log.Printf("Calling rating service. Request: PUT %s", url)
 
 	req, err := http.NewRequest(http.MethodPut, url, nil)
 	if err != nil {
